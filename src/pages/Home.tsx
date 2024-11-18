@@ -1,7 +1,7 @@
 import React from "react";
-import { ConnectionSection } from "../components/ConnectionSection";
-import { MessagesSection } from "../components/MessagesSection";
-import { SendSection } from "../components/SendSection";
+import { ConnectionSection } from "../components/home/ConnectionSection";
+import { MessagesSection } from "../components/home/MessagesSection";
+import { SendSection } from "../components/home/SendSection";
 import { useStompStore } from "../stores/stomp";
 import { Toaster } from "react-hot-toast";
 

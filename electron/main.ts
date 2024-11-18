@@ -10,9 +10,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 process.env.DIST_ELECTRON = path.join(__dirname, "..");
-process.env.DIST = path.join(process.env.DIST_ELECTRON, "../dist");
+process.env.DIST = path.join(process.env.DIST_ELECTRON, "dist");
 process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
-  ? path.join(process.env.DIST_ELECTRON, "../public")
+  ? path.join(process.env.DIST_ELECTRON, "public")
   : process.env.DIST;
 
 // Disable GPU Acceleration for Windows 7
@@ -24,10 +24,12 @@ if (process.platform === "win32") app.setAppUserModelId(app.getName());
 let mainWindow: BrowserWindow | null = null;
 
 async function createWindow() {
+  console.log("Icon", path.join(process.env.VITE_PUBLIC, "icon.png"));
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     show: false,
+    icon: path.join(process.env.VITE_PUBLIC, "icon.png"),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -46,11 +48,6 @@ async function createWindow() {
       }
     }
   } else {
-    console.log(
-      "Loading from file:",
-      path.join(process.env.DIST, "index.html")
-    );
-
     mainWindow.loadFile(path.join(process.env.DIST, "index.html"));
   }
 
