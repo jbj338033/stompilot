@@ -153,6 +153,7 @@ export default {
     resetSuccess: "설정이 초기화되었습니다",
     themeChanged: "테마가 변경되었습니다",
     languageChanged: "언어가 변경되었습니다",
+    reset: "설정 초기화",
   },
   notification: {
     newMessage: "새 STOMP 메시지",

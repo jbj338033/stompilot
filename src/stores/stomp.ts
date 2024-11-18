@@ -12,6 +12,7 @@ interface StompState {
     error?: string;
   };
   recentDestinations: string[];
+  isCancelled: boolean;
   connect: (config: {
     url: string;
     subscriptionUrl: string;
@@ -25,6 +26,7 @@ interface StompState {
     contentType: "text" | "json"
   ) => Promise<void>;
   clearMessages: () => void;
+  cancelConnection: () => void;
 }
 
 export const useStompStore = create<StompState>()((set, get) => {
@@ -40,7 +42,10 @@ export const useStompStore = create<StompState>()((set, get) => {
     headers: Header[];
   }) => {
     const settings = useSettingsStore.getState().settings;
-    if (!settings.autoReconnect) return;
+    const { isCancelled } = get();
+
+    // 취소되었거나 자동 재연결이 비활성화된 경우 재연결 시도하지 않음
+    if (isCancelled || !settings.autoReconnect) return;
 
     if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
       reconnectAttempts++;
@@ -54,7 +59,11 @@ export const useStompStore = create<StompState>()((set, get) => {
 
       clearTimeout(reconnectTimeout);
       reconnectTimeout = setTimeout(() => {
-        get().connect(config);
+        const currentState = get();
+        // 타임아웃 실행 시점에도 취소 상태 확인
+        if (!currentState.isCancelled) {
+          get().connect(config);
+        }
       }, delay);
     } else {
       toast.error("Maximum reconnection attempts reached");
@@ -66,10 +75,14 @@ export const useStompStore = create<StompState>()((set, get) => {
     messages: [],
     connectionStatus: { status: "disconnected" },
     recentDestinations: [],
+    isCancelled: false,
 
     connect: async (config) => {
       const { client } = get();
       const settings = useSettingsStore.getState().settings;
+
+      // 연결 시도 시 취소 상태 초기화
+      set({ isCancelled: false });
 
       try {
         if (client) {
@@ -81,13 +94,18 @@ export const useStompStore = create<StompState>()((set, get) => {
         const stompConfig: any = {
           brokerURL: config.url,
           connectHeaders: {
-            ...config.headers.reduce(
-              (acc, header) => ({
-                ...acc,
-                [header.key]: header.value,
-              }),
-              {}
-            ),
+            ...config.headers
+              .filter(
+                (header) =>
+                  header.key.trim() !== "" && header.value.trim() !== ""
+              )
+              .reduce(
+                (acc, header) => ({
+                  ...acc,
+                  [header.key.trim()]: header.value.trim(),
+                }),
+                {}
+              ),
             ...(config.virtualHost ? { host: config.virtualHost } : {}),
           },
           debug: (str: string) => {
@@ -137,13 +155,17 @@ export const useStompStore = create<StompState>()((set, get) => {
 
         newClient.onWebSocketError = (event) => {
           console.error("WebSocket error:", event);
+          const { isCancelled } = get();
           set({
             connectionStatus: {
               status: "error",
               error: "WebSocket connection failed",
             },
           });
-          handleReconnect(config);
+          // 취소되지 않은 경우에만 재연결 시도
+          if (!isCancelled) {
+            handleReconnect(config);
+          }
         };
 
         newClient.onDisconnect = () => {
@@ -154,13 +176,17 @@ export const useStompStore = create<StompState>()((set, get) => {
         set({ client: newClient });
       } catch (error) {
         console.error("Connection error:", error);
+        const { isCancelled } = get();
         set({
           connectionStatus: {
             status: "error",
             error: error instanceof Error ? error.message : "Unknown error",
           },
         });
-        handleReconnect(config);
+        // 취소되지 않은 경우에만 재연결 시도
+        if (!isCancelled) {
+          handleReconnect(config);
+        }
       }
     },
 
@@ -169,7 +195,11 @@ export const useStompStore = create<StompState>()((set, get) => {
       try {
         if (client) {
           await client.deactivate();
-          set({ client: null, connectionStatus: { status: "disconnected" } });
+          set({
+            client: null,
+            connectionStatus: { status: "disconnected" },
+            isCancelled: false,
+          });
           toast.success("Disconnected successfully");
         }
       } catch (error) {
@@ -212,6 +242,27 @@ export const useStompStore = create<StompState>()((set, get) => {
     clearMessages: () => {
       set({ messages: [] });
       toast.success("Messages cleared");
+    },
+
+    cancelConnection: () => {
+      const { client } = get();
+      // 진행 중인 재연결 시도 취소
+      clearTimeout(reconnectTimeout);
+      reconnectAttempts = 0;
+
+      // 취소 상태로 설정
+      set({ isCancelled: true });
+
+      // 클라이언트가 존재하면 연결 종료
+      if (client) {
+        client.deactivate();
+        set({
+          client: null,
+          connectionStatus: { status: "disconnected" },
+        });
+      }
+
+      toast.success("Connection cancelled");
     },
   };
 });

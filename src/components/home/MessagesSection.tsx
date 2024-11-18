@@ -1,10 +1,10 @@
 import React, { useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Message } from "../types";
+import { Message } from "../../types";
 import { IoTime, IoChevronDown, IoTrash, IoCopy } from "react-icons/io5";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { useSettingsStore } from "../stores/settings";
+import { useSettingsStore } from "../../stores/settings";
 
 interface MessagesSectionProps {
   messages: Message[];

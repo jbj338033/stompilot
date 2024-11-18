@@ -3,7 +3,7 @@ import { Outlet, useLocation, Link } from "react-router-dom";
 import { IoHome, IoSettings } from "react-icons/io5";
 import { motion } from "framer-motion";
 import { useSettingsStore } from "../stores/settings";
-import { LoadingOverlay } from "./LoadingOverlay";
+import { LoadingOverlay } from "./ui/LoadingOverlay";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 

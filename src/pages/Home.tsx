@@ -14,6 +14,7 @@ const Home: React.FC = () => {
     disconnect,
     sendMessage,
     clearMessages,
+    cancelConnection,
   } = useStompStore();
 
   return (
@@ -21,6 +22,7 @@ const Home: React.FC = () => {
       <Toaster position="top-right" />
 
       <ConnectionSection
+        onCancel={cancelConnection}
         isConnected={connectionStatus.status === "connected"}
         onConnect={connect}
         onDisconnect={disconnect}

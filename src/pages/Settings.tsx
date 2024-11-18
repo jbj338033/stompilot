@@ -18,7 +18,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Toggle } from "../components/Toggle";
 import { SettingCard } from "../components/SettingCard";
-import { LoadingButton } from "../components/LoadingButton";
+import { LoadingButton } from "../components/ui/LoadingButton";
 
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation();

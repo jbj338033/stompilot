@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoAdd, IoTrash, IoCheckmarkCircle, IoWarning } from "react-icons/io5";
-import { Header } from "../types";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { LoadingButton } from "./LoadingButton";
+import { LoadingButton } from "../ui/LoadingButton";
+import { useConnectionStore } from "../../stores/connection";
+import { Header } from "@/types";
 
 interface ConnectionSectionProps {
   onConnect: (config: {
@@ -14,6 +15,7 @@ interface ConnectionSectionProps {
     headers: Header[];
   }) => void;
   onDisconnect: () => void;
+  onCancel: () => void; // 새로운 prop 추가
   isConnected: boolean;
   connectionStatus: {
     status: "disconnected" | "connecting" | "connected" | "error";
@@ -24,33 +26,25 @@ interface ConnectionSectionProps {
 export const ConnectionSection: React.FC<ConnectionSectionProps> = ({
   onConnect,
   onDisconnect,
+  onCancel,
   isConnected,
   connectionStatus,
 }) => {
   const { t } = useTranslation();
-  const [url, setUrl] = useState<string>("");
-  const [subscriptionUrl, setSubscriptionUrl] = useState<string>("");
-  const [virtualHost, setVirtualHost] = useState<string>("");
-  const [headers, setHeaders] = useState<Header[]>([]);
-  const [isExpanded, setIsExpanded] = useState(true);
-
-  const addHeader = () => {
-    setHeaders([...headers, { key: "", value: "" }]);
-  };
-
-  const removeHeader = (index: number) => {
-    setHeaders(headers.filter((_, i) => i !== index));
-  };
-
-  const updateHeader = (
-    index: number,
-    field: "key" | "value",
-    value: string
-  ) => {
-    const newHeaders = [...headers];
-    newHeaders[index][field] = value;
-    setHeaders(newHeaders);
-  };
+  const {
+    url,
+    subscriptionUrl,
+    virtualHost,
+    headers,
+    isExpanded,
+    setUrl,
+    setSubscriptionUrl,
+    setVirtualHost,
+    setIsExpanded,
+    addHeader,
+    removeHeader,
+    updateHeader,
+  } = useConnectionStore();
 
   const handleConnect = () => {
     if (!url) {
@@ -228,19 +222,40 @@ export const ConnectionSection: React.FC<ConnectionSectionProps> = ({
                 </motion.div>
               )}
 
-              <LoadingButton
-                onClick={isConnected ? onDisconnect : handleConnect}
-                isLoading={connectionStatus.status === "connecting"}
-                loadingText={t("common.connecting")}
-                variant={isConnected ? "danger" : "primary"}
-                className="w-full"
-              >
-                {connectionStatus.status === "connected" &&
-                  t("connection.disconnect")}
-                {connectionStatus.status === "disconnected" &&
-                  t("connection.connect")}
-                {connectionStatus.status === "error" && t("connection.retry")}
-              </LoadingButton>
+              <div className="flex gap-2">
+                {connectionStatus.status === "connecting" ? (
+                  <>
+                    <LoadingButton
+                      isLoading={true}
+                      loadingText={t("common.connecting")}
+                      variant="primary"
+                      className="flex-1"
+                    >
+                      {t("connection.connect")}
+                    </LoadingButton>
+                    <LoadingButton
+                      onClick={onCancel}
+                      variant="secondary"
+                      className="flex-1"
+                    >
+                      {t("common.cancel")}
+                    </LoadingButton>
+                  </>
+                ) : (
+                  <LoadingButton
+                    onClick={isConnected ? onDisconnect : handleConnect}
+                    variant={isConnected ? "danger" : "primary"}
+                    className="w-full"
+                  >
+                    {connectionStatus.status === "connected" &&
+                      t("connection.disconnect")}
+                    {connectionStatus.status === "disconnected" &&
+                      t("connection.connect")}
+                    {connectionStatus.status === "error" &&
+                      t("connection.retry")}
+                  </LoadingButton>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { IoSend, IoCode, IoWarning } from "react-icons/io5";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { LoadingButton } from "./LoadingButton";
+import { LoadingButton } from "../ui/LoadingButton";
 
 interface SendSectionProps {
   onSend: (
