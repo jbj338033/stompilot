@@ -1,7 +1,7 @@
 {
   "name": "stompilot",
   "private": true,
-  "version": "1.0.4",
+  "version": "1.0.6",
   "main": "dist-electron/main.js",
   "type": "module",
   "author": "jbj338033",
@@ -71,6 +71,14 @@
     "directories": {
       "output": "release"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "jbj338033",
+        "repo": "stompilot-app",
+        "releaseType": "draft"
+      }
+    ],
     "files": [
       "dist/**/*",
       "dist-electron/**/*"
