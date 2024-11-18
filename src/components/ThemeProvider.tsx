@@ -1,13 +1,11 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSettings } from "../stores/settings";
+import { useSettingsStore } from "../stores/settings";
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const {
-    settings: { theme },
-  } = useSettings();
+  const theme = useSettingsStore((state) => state.settings.theme);
 
   useEffect(() => {
     const root = window.document.documentElement;

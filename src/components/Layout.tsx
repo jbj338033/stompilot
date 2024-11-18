@@ -2,16 +2,14 @@ import React from "react";
 import { Outlet, useLocation, Link } from "react-router-dom";
 import { IoHome, IoSettings } from "react-icons/io5";
 import { motion } from "framer-motion";
-import { useSettings } from "../stores/settings";
+import { useSettingsStore } from "../stores/settings";
 import { LoadingOverlay } from "./ui/LoadingOverlay";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
 const Layout: React.FC = () => {
   const location = useLocation();
-  const {
-    settings: { theme },
-  } = useSettings();
+  const theme = useSettingsStore((state) => state.settings.theme);
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
 
