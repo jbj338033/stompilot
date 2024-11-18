@@ -2,15 +2,15 @@
   "name": "stompilot",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
   "main": "dist-electron/main.js",
+  "type": "module",
   "author": "jbj338033",
   "scripts": {
     "dev": "vite",
-    "build": "rimraf dist dist-electron && tsc && vite build",
+    "build": "rimraf dist dist-electron && tsc -p tsconfig.electron.json && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "electron:dev": "rimraf dist dist-electron && tsc && vite dev",
+    "electron:dev": "rimraf dist dist-electron && tsc -p tsconfig.electron.json && vite dev",
     "electron:build": "rimraf dist dist-electron release && npm run build && electron-builder",
     "electron:preview": "npm run build && electron ."
   },
