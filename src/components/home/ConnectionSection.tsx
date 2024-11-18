@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { LoadingButton } from "../ui/LoadingButton";
 import { useConnectionStore } from "../../stores/connection";
-import { Header } from "@/types";
+import { Header } from "../../types";
 
 interface ConnectionSectionProps {
   onConnect: (config: {
