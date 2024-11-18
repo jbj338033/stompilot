@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { Client } from "@stomp/stompjs";
 import { Message, Header } from "../types";
-import { useSettingsStore } from "./settings";
+import { useSettings } from "./settings";
 import { toast } from "react-hot-toast";
 
 interface StompState {
@@ -41,7 +41,7 @@ export const useStompStore = create<StompState>()((set, get) => {
     virtualHost?: string;
     headers: Header[];
   }) => {
-    const settings = useSettingsStore.getState().settings;
+    const { settings } = useSettings();
     const { isCancelled } = get();
 
     // 취소되었거나 자동 재연결이 비활성화된 경우 재연결 시도하지 않음
@@ -79,7 +79,7 @@ export const useStompStore = create<StompState>()((set, get) => {
 
     connect: async (config) => {
       const { client } = get();
-      const settings = useSettingsStore.getState().settings;
+      const { settings } = useSettings();
 
       // 연결 시도 시 취소 상태 초기화
       set({ isCancelled: false });

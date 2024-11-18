@@ -1,41 +1,78 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { useEffect, useState } from "react";
 import { Settings, DEFAULT_SETTINGS } from "../types/settings";
+import Store from "electron-store";
 
-interface SettingsState {
-  settings: Settings;
-  setSettings: (settings: Partial<Settings>) => void;
-  resetSettings: () => void;
+const store = new Store({
+  name: "settings",
+  defaults: {
+    settings: DEFAULT_SETTINGS,
+  },
+});
+
+class SettingsStore {
+  private static instance: SettingsStore;
+  private subscribers: ((settings: Settings) => void)[] = [];
+
+  private constructor() {}
+
+  static getInstance(): SettingsStore {
+    if (!SettingsStore.instance) {
+      SettingsStore.instance = new SettingsStore();
+    }
+    return SettingsStore.instance;
+  }
+
+  getSettings(): Settings {
+    return store.get("settings") as Settings;
+  }
+
+  setSettings(newSettings: Partial<Settings>): void {
+    const currentSettings = this.getSettings();
+    const updatedSettings = { ...currentSettings, ...newSettings };
+    store.set("settings", updatedSettings);
+    this.notifySubscribers(updatedSettings);
+  }
+
+  resetSettings(): void {
+    store.set("settings", DEFAULT_SETTINGS);
+    this.notifySubscribers(DEFAULT_SETTINGS);
+  }
+
+  subscribe(callback: (settings: Settings) => void): () => void {
+    this.subscribers.push(callback);
+    return () => {
+      this.subscribers = this.subscribers.filter((cb) => cb !== callback);
+    };
+  }
+
+  private notifySubscribers(settings: Settings): void {
+    this.subscribers.forEach((callback) => callback(settings));
+  }
 }
 
-// Custom storage for Electron
-const electronStorage = {
-  getItem: async (name: string): Promise<string | null> => {
-    const value = await window.electron.store.get(name);
-    return value ? JSON.stringify(value) : null;
-  },
-  setItem: async (name: string, value: string): Promise<void> => {
-    const parsed = JSON.parse(value);
-    await window.electron.store.set(name, parsed);
-  },
-  removeItem: async (name: string): Promise<void> => {
-    await window.electron.store.set(name, null);
-  },
-};
+// React Hook for using settings
+export function useSettings() {
+  const [settings, setSettings] = useState<Settings>(() =>
+    SettingsStore.getInstance().getSettings()
+  );
 
-export const useSettingsStore = create<SettingsState>()(
-  persist(
-    (set) => ({
-      settings: DEFAULT_SETTINGS,
-      setSettings: (newSettings) =>
-        set((state) => ({
-          settings: { ...state.settings, ...newSettings },
-        })),
-      resetSettings: () => set({ settings: DEFAULT_SETTINGS }),
-    }),
-    {
-      name: "stomp-settings",
-      storage: createJSONStorage(() => electronStorage),
-    }
-  )
-);
+  useEffect(() => {
+    const unsubscribe = SettingsStore.getInstance().subscribe((newSettings) => {
+      setSettings(newSettings);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  return {
+    settings,
+    setSettings: (newSettings: Partial<Settings>) => {
+      SettingsStore.getInstance().setSettings(newSettings);
+    },
+    resetSettings: () => {
+      SettingsStore.getInstance().resetSettings();
+    },
+  };
+}

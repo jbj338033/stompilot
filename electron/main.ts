@@ -10,7 +10,15 @@ import installExtension, {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const store = new Store();
+interface StoreType {
+  settings?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+const store = new Store<StoreType>() as Store<StoreType> & {
+  get(key: string): unknown;
+  set(key: string, value: unknown): void;
+};
 
 process.env.DIST_ELECTRON = path.join(__dirname, "..");
 process.env.DIST = path.join(process.env.DIST_ELECTRON, "dist");
@@ -27,7 +35,6 @@ if (process.platform === "win32") app.setAppUserModelId(app.getName());
 let mainWindow: BrowserWindow | null = null;
 
 async function createWindow() {
-  console.log("Icon", path.join(process.env.VITE_PUBLIC, "icon.png"));
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -35,8 +42,7 @@ async function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC, "icon.png"),
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: true, // Changed to true for security
-      preload: path.join(__dirname, "preload.js"), // Add preload script
+      contextIsolation: false, // Changed to true for security
     },
   });
 
@@ -103,7 +109,7 @@ if (!app.requestSingleInstanceLock()) {
 
 function setupIpcHandlers() {
   // Store handlers
-  ipcMain.handle("electron-store-get", async (_event, key) => {
+  ipcMain.handle("electron-store-get", async (_event, key: string) => {
     return store.get(key);
   });
 

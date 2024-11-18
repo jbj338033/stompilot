@@ -4,7 +4,7 @@ import { Message } from "../../types";
 import { IoTime, IoChevronDown, IoTrash, IoCopy } from "react-icons/io5";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { useSettingsStore } from "../../stores/settings";
+import { useSettings } from "../../stores/settings";
 
 interface MessagesSectionProps {
   messages: Message[];
@@ -16,7 +16,7 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
   onClearMessages,
 }) => {
   const { t } = useTranslation();
-  const settings = useSettingsStore((state) => state.settings);
+  const { settings } = useSettings();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = React.useState(true);
   const [autoScroll, setAutoScroll] = React.useState(

@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSettingsStore } from "../stores/settings";
+import { useSettings } from "../stores/settings";
 import { ThemeType, LanguageType } from "../types/settings";
 import {
   IoMoon,
@@ -22,7 +22,7 @@ import { LoadingButton } from "../components/ui/LoadingButton";
 
 const Settings: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { settings, setSettings, resetSettings } = useSettingsStore();
+  const { settings, setSettings, resetSettings } = useSettings();
 
   const handleThemeChange = (theme: ThemeType) => {
     setSettings({ theme });
