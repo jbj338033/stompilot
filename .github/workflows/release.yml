@@ -2,8 +2,6 @@ name: Build and Release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - "v*"
 
@@ -28,7 +26,9 @@ jobs:
         run: npm i
 
       - name: Build application
-        run: GH_TOKEN=${{ secrets.GH_TOKEN }} npm run electron:build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npm run electron:build
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
