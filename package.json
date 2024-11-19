@@ -65,7 +65,7 @@
     "tailwindcss"
   ],
   "build": {
-    "productName": "stompilot",
+    "productName": "Stompilot",
     "appId": "com.stompilot",
     "asar": true,
     "directories": {
