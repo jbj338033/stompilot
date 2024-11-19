@@ -65,7 +65,7 @@
     "tailwindcss"
   ],
   "build": {
-    "productName": "Stompilot",
+    "productName": "stompilot",
     "appId": "com.stompilot",
     "asar": true,
     "directories": {
@@ -75,8 +75,7 @@
       {
         "provider": "github",
         "owner": "jbj338033",
-        "repo": "stompilot-app",
-        "releaseType": "draft"
+        "repo": "stompilot-app"
       }
     ],
     "files": [
@@ -84,7 +83,7 @@
       "dist-electron/**/*"
     ],
     "mac": {
-      "artifactName": "${productName}_${version}.${ext}",
+      "artifactName": "${productName}.${ext}",
       "target": [
         "dmg"
       ],
@@ -99,7 +98,7 @@
           ]
         }
       ],
-      "artifactName": "${productName}_${version}.${ext}",
+      "artifactName": "${productName}.${ext}",
       "icon": "build/icon.png"
     }
   }
