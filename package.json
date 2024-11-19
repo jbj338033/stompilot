@@ -1,7 +1,7 @@
 {
   "name": "stompilot",
   "private": true,
-  "version": "1.0.12",
+  "version": "1.0.13",
   "main": "dist-electron/main.js",
   "type": "module",
   "author": "jbj338033",
