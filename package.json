@@ -75,7 +75,8 @@
       {
         "provider": "github",
         "owner": "jbj338033",
-        "repo": "stompilot-app"
+        "repo": "stompilot-app",
+        "releaseType": "draft"
       }
     ],
     "files": [
